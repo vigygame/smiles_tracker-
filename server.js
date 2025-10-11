@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 
 // Initialize OpenAI
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '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'
+  apiKey: process.env.OPENAI_API_KEY || ''
 });
 
 // Middleware
@@ -703,3 +703,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
