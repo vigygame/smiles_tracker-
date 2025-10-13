@@ -29,14 +29,22 @@ const Navbar: React.FC = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ flexGrow: 1, cursor: 'pointer' }}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            flexGrow: 1,
+            cursor: 'pointer',
+          }}
           onClick={() => navigate('/dashboard')}
         >
-          Smiles Tracker
-        </Typography>
+          <img
+            src="/logo.png"
+            alt="Logo"
+            style={{ height: 60, marginRight: 12 }}
+          />
+         
+        </Box>
         
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="body2" sx={{ mr: 2 }}>
