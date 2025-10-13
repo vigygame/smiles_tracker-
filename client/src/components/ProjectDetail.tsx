@@ -8,13 +8,15 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  useDroppable
 } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+
 import {
-  useSortable,
+  useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
@@ -81,7 +83,6 @@ interface ProjectSummary {
   created_at: string;
   updated_at: string;
 }
-
 // Sortable Ticket Component
 const SortableTicket: React.FC<{
   ticket: Ticket;
@@ -134,6 +135,25 @@ const SortableTicket: React.FC<{
         variant="outlined"
       />
     </Card>
+  );
+};
+
+// Droppable Column Component
+const DroppableColumn: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <Box
+      ref={setNodeRef}
+      sx={{
+        backgroundColor: isOver ? '#e3f2fd' : undefined,
+        borderRadius: 1,
+        minHeight: 250,
+        p: 1,
+        transition: 'background-color 0.2s',
+      }}
+    >
+      {children}
+    </Box>
   );
 };
 
@@ -454,66 +474,51 @@ const ProjectDetail: React.FC = () => {
             <Box>
               {/* Summary Panel */}
               {summary && (
-                <Card sx={{ mb: 3, p: 2 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Project Summary
-                  </Typography>
-                  <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                    {summary.summary}
-                  </Typography>
-                </Card>
-              )}
-
-              {tickets.length === 0 ? (
-                <Box sx={{ textAlign: 'center', py: 4 }}>
-                  <Typography variant="h6" color="text.secondary" gutterBottom>
-                    No tickets generated yet
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Upload files and click "Generate Tickets" to create tickets from your content
-                  </Typography>
-                </Box>
-              ) : (
                 <DndContext
                   sensors={sensors}
                   onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
                 >
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 2 }}>
-                    {['todo', 'in_progress', 'done'].map((status) => {
-                      const statusTickets = tickets.filter(ticket => ticket.status === status);
-                      return (
-                        <Box key={status}>
-                          <Typography variant="h6" gutterBottom sx={{ textTransform: 'capitalize' }}>
-                            {status.replace('_', ' ')} ({statusTickets.length})
-                          </Typography>
-                          <SortableContext
-                            id={status}
-                            items={statusTickets.map(ticket => ticket.id)}
-                            strategy={verticalListSortingStrategy}
-                          >
-                            <Box
-                              sx={{ 
-                                minHeight: 200, 
-                                border: '2px dashed #ccc', 
-                                borderRadius: 1, 
-                                p: 1,
-                                backgroundColor: '#fafafa',
-                                transition: 'background-color 0.2s ease'
-                              }}
+                    <SortableContext
+                      items={['todo', 'in_progress', 'done']}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {['todo', 'in_progress', 'done'].map((status) => {
+                        const statusTickets = tickets.filter(ticket => ticket.status === status);
+                        return (
+                          <DroppableColumn key={status} id={status}>
+                            <Typography variant="h6" gutterBottom sx={{ textTransform: 'capitalize' }}>
+                              {status.replace('_', ' ')} ({statusTickets.length})
+                            </Typography>
+                            <SortableContext
+                              id={status}
+                              items={statusTickets.map(ticket => ticket.id)}
+                              strategy={verticalListSortingStrategy}
                             >
-                              {statusTickets.map((ticket) => (
-                                <SortableTicket
-                                  key={ticket.id}
-                                  ticket={ticket}
-                                  onStatusChange={handleStatusChange}
-                                />
-                              ))}
-                            </Box>
-                          </SortableContext>
-                        </Box>
-                      );
-                    })}
+                              <Box
+                                sx={{
+                                  minHeight: 200,
+                                  border: '2px dashed #ccc',
+                                  borderRadius: 1,
+                                  p: 1,
+                                  backgroundColor: '#fafafa',
+                                  transition: 'background-color 0.2s ease'
+                                }}
+                              >
+                                {statusTickets.map((ticket) => (
+                                  <SortableTicket
+                                    key={ticket.id}
+                                    ticket={ticket}
+                                    onStatusChange={handleStatusChange}
+                                  />
+                                ))}
+                              </Box>
+                            </SortableContext>
+                          </DroppableColumn>
+                        );
+                      })}
+                    </SortableContext>
                   </Box>
                   <DragOverlay>
                     {activeId ? (
@@ -527,9 +532,9 @@ const ProjectDetail: React.FC = () => {
                 </DndContext>
               )}
             </Box>
-          )}
-        </CardContent>
-      </Card>
+          )};
+          </CardContent>
+          </Card>        
 
       {/* Upload Dialog */}
       <Dialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} maxWidth="sm" fullWidth>
