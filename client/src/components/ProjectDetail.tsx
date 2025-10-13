@@ -536,29 +536,94 @@ const ProjectDetail: React.FC = () => {
         <DialogTitle>Upload Files</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Allowed file types: PDF, MD, DOC, DOCX, TXT, MP3, WAV
+        Allowed file types: PDF, MD, DOC, DOCX, TXT, MP3, WAV
           </Typography>
-          <input
-            type="file"
-            multiple
-            accept=".pdf,.md,.doc,.docx,.txt,.mp3,.wav"
-            onChange={handleFileSelect}
-            style={{ width: '100%', marginTop: '16px' }}
-          />
-          {selectedFiles && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              {selectedFiles.length} file(s) selected
+          <Box
+        sx={{
+          border: '2px dashed #aaa',
+          borderRadius: 2,
+          p: 3,
+          textAlign: 'center',
+          backgroundColor: '#fafbfc',
+          cursor: uploading ? 'not-allowed' : 'pointer',
+          mb: 2,
+          transition: 'border-color 0.2s',
+          '&:hover': { borderColor: '#1976d2' }
+        }}
+        onDragOver={e => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onDrop={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (uploading) return;
+          const files = e.dataTransfer.files;
+          if (files && files.length > 0) {
+            // Merge with existing selectedFiles
+            setSelectedFiles(prev => {
+          if (!prev) return files;
+          // Merge FileList objects into a new DataTransfer
+          const dt = new DataTransfer();
+          Array.from(prev).forEach(f => dt.items.add(f));
+          Array.from(files).forEach(f => dt.items.add(f));
+          return dt.files;
+            });
+          }
+        }}
+        onClick={() => {
+          if (uploading) return;
+          document.getElementById('file-upload-input')?.click();
+        }}
+          >
+        <input
+          id="file-upload-input"
+          type="file"
+          multiple
+          accept=".pdf,.md,.doc,.docx,.txt,.mp3,.wav"
+          onChange={e => {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+          setSelectedFiles(prev => {
+            if (!prev) return files;
+            // Merge FileList objects into a new DataTransfer
+            const dt = new DataTransfer();
+            Array.from(prev).forEach(f => dt.items.add(f));
+            Array.from(files).forEach(f => dt.items.add(f));
+            return dt.files;
+          });
+          // Reset input value so the same file can be selected again if needed
+          e.target.value = '';
+            }
+          }}
+          style={{ display: 'none' }}
+          disabled={uploading}
+        />
+        <Typography variant="body1" color="text.secondary">
+          Drag &amp; drop files here, or <span style={{ color: '#1976d2', textDecoration: 'underline', cursor: 'pointer' }}>browse</span>
+        </Typography>
+        {selectedFiles && (
+          <Box sx={{ mt: 1, textAlign: 'left' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+          {selectedFiles.length} file(s) selected:
             </Typography>
-          )}
+            <ul style={{ margin: 0, paddingLeft: 18 }}>
+          {Array.from(selectedFiles).map((file, idx) => (
+            <li key={idx} style={{ fontSize: 14, color: '#555' }}>{file.name}</li>
+          ))}
+            </ul>
+          </Box>
+        )}
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setUploadDialogOpen(false)}>Cancel</Button>
           <Button
-            onClick={handleFileUpload}
-            variant="contained"
-            disabled={!selectedFiles || uploading}
+        onClick={handleFileUpload}
+        variant="contained"
+        disabled={!selectedFiles || uploading}
           >
-            {uploading ? <CircularProgress size={20} /> : 'Upload'}
+        {uploading ? <CircularProgress size={20} /> : 'Upload'}
           </Button>
         </DialogActions>
       </Dialog>
