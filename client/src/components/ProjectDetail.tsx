@@ -269,6 +269,7 @@ const ProjectDetail: React.FC = () => {
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Files selected:', event.target.files);
     setSelectedFiles(event.target.files);
   };
 
@@ -449,10 +450,27 @@ const ProjectDetail: React.FC = () => {
                         >
                           <Download />
                         </IconButton>
-                        {file.file_type === 'audio' && (
+                        {file.file_type === 'audio' ? (
                           <IconButton edge="end" aria-label="play">
                             <PlayArrow />
                           </IconButton>
+                        ) : (
+                          <a
+                            href={`http://localhost:5000/api/files/${file.id}/view`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ display: 'inline-flex' }}
+                          >
+                            <IconButton
+                              edge="end"
+                              aria-label="view"
+                              component="span"
+                            >
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z" fill="currentColor"/>
+                              </svg>
+                            </IconButton>
+                          </a>
                         )}
                         <IconButton 
                           edge="end" 
@@ -565,6 +583,7 @@ const ProjectDetail: React.FC = () => {
           if (uploading) return;
           const files = e.dataTransfer.files;
           if (files && files.length > 0) {
+            console.log('Files dropped:', files);
             // Merge with existing selectedFiles
             setSelectedFiles(prev => {
           if (!prev) return files;
@@ -589,23 +608,34 @@ const ProjectDetail: React.FC = () => {
           onChange={e => {
             const files = e.target.files;
             if (files && files.length > 0) {
-          setSelectedFiles(prev => {
-            if (!prev) return files;
-            // Merge FileList objects into a new DataTransfer
-            const dt = new DataTransfer();
-            Array.from(prev).forEach(f => dt.items.add(f));
-            Array.from(files).forEach(f => dt.items.add(f));
-            return dt.files;
-          });
-          // Reset input value so the same file can be selected again if needed
-          e.target.value = '';
+              setSelectedFiles(prev => {
+                const dt = new DataTransfer();
+                if (prev) {
+                  Array.from(prev).forEach(f => dt.items.add(f));
+                }
+                Array.from(files).forEach(f => dt.items.add(f));
+                return dt.files;
+              });
+              // Reset input value so the same file can be selected again if needed
+              e.target.value = '';
             }
           }}
           style={{ display: 'none' }}
           disabled={uploading}
         />
         <Typography variant="body1" color="text.secondary">
-          Drag &amp; drop files here, or <span style={{ color: '#1976d2', textDecoration: 'underline', cursor: 'pointer' }}>browse</span>
+          Drag &amp; drop files here, or{' '}
+          <span
+            style={{ color: '#1976d2', textDecoration: 'underline', cursor: 'pointer' }}
+            onClick={e => {
+              e.stopPropagation();
+              if (!uploading) {
+                document.getElementById('file-upload-input')?.click();
+              }
+            }}
+          >
+            browse
+          </span>
         </Typography>
         {selectedFiles && (
           <Box sx={{ mt: 1, textAlign: 'left' }}>
