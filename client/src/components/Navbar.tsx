@@ -27,7 +27,9 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{
+        background: "linear-gradient(90deg, #009846 0%, #FFD700 100%)", // Happiest Minds theme: green + yellow
+      }}>
       <Toolbar>
         <Box
           sx={{
