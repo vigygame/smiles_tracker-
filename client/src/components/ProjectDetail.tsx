@@ -265,76 +265,6 @@ const ProjectDetail: React.FC = () => {
         </Box>
         <CardContent>
           {activeTab === 0 && (
-<<<<<<< HEAD
-            <Box>
-              {files.length === 0 ? (
-                <Box sx={{ textAlign: 'center', py: 4 }}>
-                  <Typography variant="h6" color="text.secondary" gutterBottom>
-                    No files uploaded yet
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Upload audio recordings and documents to get started
-                  </Typography>
-                </Box>
-              ) : (
-                <List>
-                  {files.map((file) => (
-                    <ListItem key={file.id} divider>
-                      <ListItemText
-                        primary={file.original_name}
-                        secondary={`${file.file_type.toUpperCase()} • ${formatFileSize(file.file_size)} • ${new Date(file.uploaded_at).toLocaleString()}`}
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton 
-                          edge="end" 
-                          aria-label="download"
-                          onClick={() => {
-                            // Create download link
-                            const link = document.createElement('a');
-                            link.href = `/api/files/${file.id}/download`;
-                            link.download = file.original_name;
-                            link.click();
-                          }}
-                        >
-                          <Download />
-                        </IconButton>
-                        {file.file_type === 'audio' ? (
-                          <IconButton edge="end" aria-label="play">
-                            <PlayArrow />
-                          </IconButton>
-                        ) : (
-                          <a
-                            href={`http://localhost:5000/api/files/${file.id}/view`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ display: 'inline-flex' }}
-                          >
-                            <IconButton
-                              edge="end"
-                              aria-label="view"
-                              component="span"
-                            >
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z" fill="currentColor"/>
-                              </svg>
-                            </IconButton>
-                          </a>
-                        )}
-                        <IconButton 
-                          edge="end" 
-                          aria-label="delete"
-                          onClick={() => handleDeleteFile(file.id)}
-                          color="error"
-                        >
-                          <Delete />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </Box>
-=======
             <List>
               {files.map((file) => (
                 <ListItem key={file.id} divider>
@@ -374,7 +304,6 @@ const ProjectDetail: React.FC = () => {
                 </ListItem>
               ))}
             </List>
->>>>>>> 3536c3ad07efa5b28d26fd0eb42f842fae181253
           )}
 
 {activeTab === 1 && summary && (
@@ -468,20 +397,14 @@ const ProjectDetail: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Upload Dialog */}
-      <Dialog
-        open={uploadDialogOpen}
-        onClose={() => setUploadDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
+     {/* Upload Dialog */}
+      <Dialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Upload Files</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Allowed file types: PDF, MD, DOC, DOCX, TXT, MP3, WAV
+        Allowed file types: PDF, MD, DOC, DOCX, TXT, MP3, WAV
           </Typography>
           <Box
-<<<<<<< HEAD
         sx={{
           border: '2px dashed #aaa',
           borderRadius: 2,
@@ -503,7 +426,6 @@ const ProjectDetail: React.FC = () => {
           if (uploading) return;
           const files = e.dataTransfer.files;
           if (files && files.length > 0) {
-            console.log('Files dropped:', files);
             // Merge with existing selectedFiles
             setSelectedFiles(prev => {
           if (!prev) return files;
@@ -561,52 +483,24 @@ const ProjectDetail: React.FC = () => {
           <Box sx={{ mt: 1, textAlign: 'left' }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
           {selectedFiles.length} file(s) selected:
-=======
-            sx={{
-              border: '2px dashed #aaa',
-              borderRadius: 2,
-              p: 3,
-              textAlign: 'center',
-              backgroundColor: '#fafbfc',
-              cursor: uploading ? 'not-allowed' : 'pointer',
-            }}
-            onClick={() =>
-              !uploading &&
-              document.getElementById('file-upload-input')?.click()
-            }
-          >
-            <input
-              id="file-upload-input"
-              type="file"
-              multiple
-              accept=".pdf,.md,.doc,.docx,.txt,.mp3,.wav"
-              onChange={handleFileSelect}
-              style={{ display: 'none' }}
-              disabled={uploading}
-            />
-            <Typography variant="body1" color="text.secondary">
-              Drag & drop files here, or{' '}
-              <span
-                style={{
-                  color: '#1976d2',
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
-                }}
-              >
-                browse
-              </span>
->>>>>>> 3536c3ad07efa5b28d26fd0eb42f842fae181253
             </Typography>
+            <ul style={{ margin: 0, paddingLeft: 18 }}>
+          {Array.from(selectedFiles).map((file, idx) => (
+            <li key={idx} style={{ fontSize: 14, color: '#555' }}>{file.name}</li>
+          ))}
+            </ul>
+          </Box>
+        )}
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setUploadDialogOpen(false)}>Cancel</Button>
           <Button
-            onClick={handleFileUpload}
-            variant="contained"
-            disabled={!selectedFiles || uploading}
+        onClick={handleFileUpload}
+        variant="contained"
+        disabled={!selectedFiles || uploading}
           >
-            {uploading ? <CircularProgress size={20} /> : 'Upload'}
+        {uploading ? <CircularProgress size={20} /> : 'Upload'}
           </Button>
         </DialogActions>
       </Dialog>
